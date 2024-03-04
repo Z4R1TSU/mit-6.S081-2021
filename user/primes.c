@@ -5,7 +5,7 @@
 void stage_loop(int p1[2]) {
     int p = 0;
 
-    close(p1[1]);
+    close(p1[1]); // we only need to read from last stage, so close last pipe's write end
     read(p1[0], &p, 4);
 
     if (p == 0) {
@@ -18,7 +18,7 @@ void stage_loop(int p1[2]) {
     pipe(p2);
     
     if (fork() == 0) {
-        close(p2[0]);
+        close(p2[0]); // need to write to next stage, so close p2's read end
         int n;
 
         while (read(p1[0], &n, 4)) {
