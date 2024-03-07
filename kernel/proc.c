@@ -114,6 +114,10 @@ allocproc(void)
       release(&p->lock);
     }
   }
+
+  // initialize mask of the process for lab2 syscall t1 trace
+  p->mask = 0;
+
   return 0;
 
 found:
@@ -164,6 +168,8 @@ freeproc(struct proc *p)
   p->killed = 0;
   p->xstate = 0;
   p->state = UNUSED;
+  // initialize mask of the process for lab2 syscall t1 trace
+  p->mask = 0;
 }
 
 // Create a user page table for a given process,
@@ -288,6 +294,10 @@ fork(void)
     return -1;
   }
   np->sz = p->sz;
+
+  // for lab2 syscall t1 trace:
+  // copy the trace mask form parent to the child process
+  np->mask = p->mask;
 
   // copy saved user registers.
   *(np->trapframe) = *(p->trapframe);
