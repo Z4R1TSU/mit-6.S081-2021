@@ -7,6 +7,9 @@
 #include "spinlock.h"
 #include "proc.h"
 
+// include head file for lab2 syscall t2 sysinfo
+#include "sysinfo.h"
+
 uint64
 sys_exit(void)
 {
@@ -104,6 +107,24 @@ uint64 sys_trace(void) {
   }
 
   myproc()->mask = mask;
+
+  return 0;
+}
+
+uint64 sys_sysinfo(void) {
+  struct sysinfo info;
+  uint64 addr;
+
+  if(argaddr(0, &addr) < 0) {
+    return -1;
+  }
+
+  info.freemem = get_free_memory();
+  info.nproc = get_not_unused_proc();
+
+  if(copyout(myproc()->pagetable, addr, (char *)&info, sizeof(info)) < 0) {
+    return -1;
+  }
 
   return 0;
 }

@@ -1,5 +1,7 @@
 struct stat;
 struct rtcdate;
+// declear for lab2 syscall t2 sysinfo
+struct sysinfo;
 
 // system calls
 int fork(void);
@@ -24,6 +26,7 @@ char* sbrk(int);
 int sleep(int);
 int uptime(void);
 int trace(int);
+int sysinfo(struct sysinfo *);
 
 // ulib.c
 int stat(const char*, struct stat*);
