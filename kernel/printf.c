@@ -142,6 +142,11 @@ void backtrace(void) {
   uint64 cur_fp = r_fp();
 
   while (PGROUNDDOWN(cur_fp) < cur_fp && PGROUNDUP(cur_fp) > cur_fp) {
+    // Q: Why we need this format instead of *(cur_fp-8) or (uint64)(cur_fp-8)
+    // A: s0(fp) register store the address of frame pointer, so we need to
+    // '*' it to get the value of frame pointer itself, so *(cur_fp) first.
+    // then c disallow this dereference without type casting, so *(uint64*)(cur_fp)
+    // is neccessary. meanwhile cur_fp is a pointer that points to an uint64 type value
     uint64 ra = *(uint64*)(cur_fp - 8);
 
     printf("%p\n", ra);
