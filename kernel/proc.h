@@ -106,8 +106,10 @@ struct proc {
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
 
-  // add field for lab4 traps t2 alarm
-  int interval;                // the alarm interval
-  uint64 handler;              // the pointer to the handler function
-  int ticks_pass;              // how many ticks have passed since last call
+  // add fields for lab4 traps t2 alarm
+  int interval;                // The alarm interval
+  uint64 handler;              // The pointer to the handler function
+  int ticks_pass;              // How many ticks have passed since last call
+  struct trapframe *saving_context;   // To save and restore registers and neccessary state
+  int ishandling;              // Flag bit to determine the handler fn is running or not 
 };
