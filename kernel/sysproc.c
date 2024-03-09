@@ -55,6 +55,9 @@ sys_sbrk(void)
 uint64
 sys_sleep(void)
 {
+  // add backtrace call for lab4 traps t1 backtrace
+  backtrace();
+
   int n;
   uint ticks0;
 

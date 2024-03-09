@@ -80,6 +80,8 @@ int             pipewrite(struct pipe*, uint64, int);
 void            printf(char*, ...);
 void            panic(char*) __attribute__((noreturn));
 void            printfinit(void);
+// add backtrace defination for lab4 traps t1 backtrace  
+void            backtrace(void);
 
 // proc.c
 int             cpuid(void);
