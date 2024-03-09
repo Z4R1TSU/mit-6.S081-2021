@@ -76,9 +76,17 @@ usertrap(void)
   if(p->killed)
     exit(-1);
 
+  // incre the ticks that have passed since last call
+  p->ticks_pass ++;
+
   // give up the CPU if this is a timer interrupt.
-  if(which_dev == 2)
+  if (which_dev == 2) {
+    if (p->ticks_pass % p->interval) {
+      p->trapframe->epc = p->handler;
+    }
+
     yield();
+  }
 
   usertrapret();
 }
