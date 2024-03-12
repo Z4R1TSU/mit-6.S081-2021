@@ -40,6 +40,20 @@ make: 'kernel/kernel' is up to date.
 == Test barrier == gcc -o barrier -g -O2 -DSOL_THREAD -DLAB_THREAD notxv6/barrier.c -pthread
 barrier: OK (4.9s) 
 
-> lab 6 grade:
-
+> lab 6 grade:  
+…2 !1 ?1 ▓▒░░▒▓ ✔  06:19:38 PM ▓▒░
+╰─ ./grade-lab-thread 
+make: 'kernel/kernel' is up to date.
+== Test uthread == uthread: OK (1.8s) 
+== Test answers-thread.txt == answers-thread.txt: OK 
+== Test ph_safe == make: 'ph' is up to date.
+ph_safe: OK (8.1s) 
+== Test ph_fast == make: 'ph' is up to date.
+ph_fast: OK (18.0s) 
+== Test barrier == make: 'barrier' is up to date.
+barrier: OK (4.7s) 
+== Test time == 
+time: FAIL 
+    Cannot read time.txt
+Score: 59/60
     
