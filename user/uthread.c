@@ -99,7 +99,13 @@ thread_create(void (*func)())
   t->state = RUNNABLE;
   // YOUR CODE HERE
   // above code find the first thread which state is free
+
+  // set ra to func make process return to func after switching
+  // Q: Why RA stores the address of next instruction instead of PC?
+  // A: RA usually means Return Address. However, in the threading
+  //    scheduling, it plays the role as PC does
   t->context.ra = (uint64)func;
+  // set sp to stack top create a brand new function stack
   t->context.sp = (uint64)(t->stack + STACK_SIZE);
 }
 
