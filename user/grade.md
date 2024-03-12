@@ -31,4 +31,8 @@ make: 'kernel/kernel' is up to date.
 ph_fast: OK (19.2s) 
 
 * barrier
+    * [x] You have to deal with a succession of barrier calls, each of which we'll call a round. bstate.round records the current round. You should increment bstate.round each time all threads have reached the barrier.
+    * [x] You have to handle the case in which one thread races around the loop before the others have exited the barrier. In particular, you are re-using the bstate.nthread variable from one round to the next. Make sure that a thread that leaves the barrier and races around the loop doesn't increase bstate.nthread while a previous round is still using it.
+
+> lab 6 grade:  
     
