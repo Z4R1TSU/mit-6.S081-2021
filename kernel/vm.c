@@ -313,11 +313,13 @@ uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
 
     // Clear PTE_W in the PTEs of both child and parent.
     // Set the PTE_C to both child and parent to indicate COW fork
-    *pte &= (~PTE_W);
-    *pte |= (PTE_C);
+    // *pte = (*pte | PTE_C) & (~PTE_W);
 
     pa = PTE2PA(*pte);
     flags = PTE_FLAGS(*pte);
+
+    flags = (flags | PTE_C) & (~PTE_W);
+    *pte = PA2PTE(pa) | flags;
 
     // map the parent's physical pages into the child, instead of allocating new pages
     if (mappages(new, i, PGSIZE, (uint64)pa, flags) != 0) {
@@ -365,17 +367,39 @@ copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
 
   while(len > 0){
     va0 = PGROUNDDOWN(dstva);
-    pa0 = walkaddr(pagetable, va0);
 
+    // encounter a COW page allocate a new page with PTE_W and !PTE_C
+    if (va0 >= MAXVA) {
+      exit(-1);
+    }
+    
     pte_t *pte = walk(pagetable, va0, 0);
-    if (*pte & PTE_C) {
-      char *mem = kalloc();
-      memmove(mem, (char*)pa0, PGSIZE);
-      kfree((char*)pa0);
-      *pte = (*pte | PTE_W) & (~PTE_C);
-      pa0 = (uint64)mem;
+
+    if (!pte) {
+      exit(-1);
     }
 
+    pa0 = PTE2PA(*pte);
+    uint flags = PTE_FLAGS(*pte);
+
+    if ((*pte & PTE_V) && (*pte & PTE_C)) {
+      // allocate a new page with kalloc()
+      char *mem = kalloc();
+      if (!mem) {
+        exit(-1);
+      }
+      // copy the old page to the new page
+      memmove(mem, (char*)pa0, PGSIZE);
+      // install the new page in the PTE with PTE_W set and PTE_C reset
+      flags = (flags | PTE_W) & (~PTE_C);
+      *pte = PA2PTE((uint64)mem) | flags;
+      // free the old page
+      kfree((void*)pa0);
+      
+      exit(0);
+    }
+
+    pa0 = walkaddr(pagetable, va0);
     if(pa0 == 0)
       return -1;
     n = PGSIZE - (dstva - va0);

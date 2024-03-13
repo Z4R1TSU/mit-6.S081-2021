@@ -39,7 +39,7 @@ void
 kinit()
 {
   initlock(&kmem.lock, "kmem");
-  memset(ref_cnt, KERNBASE, sizeof(ref_cnt));
+  memset(ref_cnt, 0, sizeof(ref_cnt));
   freerange(end, (void*)PHYSTOP);
 }
 
@@ -65,9 +65,6 @@ kfree(void *pa)
     panic("kfree");
 
   if (-- ref_cnt[ref_idx((uint64)pa)] <= 0) {
-    // reset reference count
-    ref_cnt[ref_idx((uint64)pa)] = 0;
-
     // Fill with junk to catch dangling refs.
     memset(pa, 1, PGSIZE);
 
@@ -98,7 +95,7 @@ kalloc(void)
     memset((char*)r, 5, PGSIZE); // fill with junk
 
     // set this page's reference count to 1 for lab5 COW
-    ref_cnt[ref_idx(r)] = 0;
+    ref_cnt[ref_idx(r)] ++;
   }
   return (void*)r;
 }

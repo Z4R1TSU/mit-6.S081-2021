@@ -75,9 +75,9 @@ usertrap(void)
     
     pte_t *pte = walk(p->pagetable, va, 0);
 
-    if (pte == 0) {
+    if (!pte) {
       p->killed = 1;
-      exit(01);
+      exit(-1);
     }
 
     uint64 pa = PTE2PA(*pte);
@@ -86,13 +86,18 @@ usertrap(void)
     if ((*pte & PTE_V) && (*pte & PTE_C)) {
       // allocate a new page with kalloc()
       char *mem = kalloc();
+      if (!mem) {
+        exit(-1);
+      }
       // copy the old page to the new page
       memmove(mem, (char*)pa, PGSIZE);
       // install the new page in the PTE with PTE_W set and PTE_C reset
       flags = (flags | PTE_W) & (~PTE_C);
-      // mappages(p->pagetable, va, PGSIZE, (uint64)mem, flags);
-      kfree((char*)pa);
-      *pte = PA2PTE(mem) | flags;
+      *pte = PA2PTE((uint64)mem) | flags;
+      // free the old page
+      kfree((void*)pa);
+      
+      exit(0);
     }
   } else if((which_dev = devintr()) != 0){
     // ok
