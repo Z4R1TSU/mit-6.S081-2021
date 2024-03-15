@@ -16,3 +16,7 @@
     * [x `push_off()` and `pop_off()` to turn interrupts off and on
 
     * [] `snprintf()` in kernel/sprintf.c for string formatting
+
+2. buffeer cache
+
+    can not figure it out
