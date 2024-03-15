@@ -13,9 +13,9 @@
 
     * [x] `cpuid()`
 
-    * [x `push_off()` and `pop_off()` to turn interrupts off and on
+    * [x] `push_off()` and `pop_off()` to turn interrupts off and on
 
-    * [] `snprintf()` in kernel/sprintf.c for string formatting
+    * [ ] `snprintf()` in kernel/sprintf.c for string formatting
 
 2. buffeer cache
 
