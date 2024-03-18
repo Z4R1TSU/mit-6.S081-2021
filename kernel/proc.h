@@ -105,4 +105,16 @@ struct proc {
   struct file *ofile[NOFILE];  // Open files
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
+  struct vma *vma;
 };
+
+// struucture Virtual Memory Area
+struct vma {
+  uint64 addr;
+  int len;
+  int prot;
+  struct file *f;
+  int flags;
+};
+
+struct vma vma_array[16];

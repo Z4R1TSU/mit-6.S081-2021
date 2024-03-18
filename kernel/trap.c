@@ -65,6 +65,33 @@ usertrap(void)
     intr_on();
 
     syscall();
+  } else if (r_scause() == 12 || r_scause() == 13 || r_scause() == 15) {
+    uint64 va = r_stval();
+    if (va >= MAXVA) {
+      p->killed = 1;
+      exit(-1);
+    }
+    va = PGROUNDDOWN(va);
+
+    struct vma *vma = p->vma;
+
+    for (int i = 0; i < 16; i ++) {
+      if (va >= vma_array[i].addr && va <= vma_array[i].addr + vma_array[i].len) {
+        char *mem = kalloc();
+        if (!mem) {
+          exit(-1);
+        }
+
+        memset(mem, 0, PGSIZE);
+        uint flags = PROT_READ | PTE_U;
+
+        if (mappages(p->pagetable, va, PGSIZE, (uint64)mem, flags) < 0) {
+          kfree(mem);
+          exit(-1);
+        }
+      }
+    }
+
   } else if((which_dev = devintr()) != 0){
     // ok
   } else {

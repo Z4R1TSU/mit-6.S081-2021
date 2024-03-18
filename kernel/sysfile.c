@@ -484,3 +484,53 @@ sys_pipe(void)
   }
   return 0;
 }
+
+uint64 sys_mmap(void) {
+  int len, prot, flags, fd;
+  struct file *f;
+  struct proc *p = myproc();
+
+  if (argint(1, &len) < 0 || argint(2, &prot) < 0 || argint(3, &flags) < 0 || argfd(4, &fd, &f) < 0) {
+    return -1;
+  }
+  if (!f->writable) {
+    return -1;
+  }
+
+  struct vma *vma = p->vma;
+
+  for (int i = 0; i < 16; i ++) {
+    vma_array[i].addr = p->sz;
+    vma_array[i].f = filedup(f);
+    vma_array[i].flags = flags;
+    vma_array[i].len = len;
+    vma_array[i].prot = prot;
+    p->sz += vma_array[i].len;
+    return vma_array[i].addr;
+  }
+
+  return 0xffffffffffffffff;
+}
+
+uint64 sys_munmap(void) {
+  uint64 addr;
+  int len;
+  struct proc *p = myproc();
+
+  if (argaddr(0, &addr) < 0 || argint(1, &len) < 0) {
+    return -1;
+  }
+
+  struct vma *vma = p->vma;
+  addr = PGROUNDDOWN(addr);
+
+  for (int i = 0; i < 16; i ++) {
+    if (addr >= vma_array[i].addr && addr <= vma_array[i].addr + vma_array[i].len) {
+      p->sz = vma_array[i].len;
+    }
+  }
+
+  uvmunmap(p->pagetable, addr, PGROUNDDOWN(len) / PGSIZ, 0);
+
+  return 0;
+}
